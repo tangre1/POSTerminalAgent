@@ -7,6 +7,15 @@ public class SystemInfo {
 
     public static void main(String[] args) {
 
+        System.out.println("POS Terminal Agent starting...");
+        System.out.println("Starting check-in thread...");
+
+        CheckInThread checkInThread = new CheckInThread();
+        checkInThread.start();
+    }
+
+    public static void runCheckIn() {
+
         String osName = System.getProperty("os.name").toLowerCase();
 
         SystemData data = new SystemData();

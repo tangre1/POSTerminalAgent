@@ -1,5 +1,6 @@
 SystemData.class
 MacHardwareCommands.class
 LinuxHardwareCommands.class
+CheckInThread.class
 SystemInfo.class
 CommandRunner.class
