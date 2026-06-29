@@ -6,20 +6,32 @@ public class SystemInfo {
 
     public static void main(String[] args) {
 
-        // Collect raw outputs
-        String osInfo = CommandRunner.runCommand("uname", "-a");
-        String diskInfo = CommandRunner.runCommand("df", "-h");
-        String uptimeInfo = CommandRunner.runCommand("uptime");
-        String cpuInfo = getCPUInfo();
-        String memoryInfo = getMemoryInfo();
-        String userInfo = CommandRunner.runCommand("who");
+        String osName = System.getProperty("os.name").toLowerCase();
 
-        // Extract relevant values
+        String osInfo;
+        String diskInfo;
+        String uptimeInfo;
+        String cpuInfo;
+        String memoryInfo;
+
+        if (osName.contains("linux")) {
+            osInfo = LinuxHardwareCommands.getOsVersion();
+            diskInfo = LinuxHardwareCommands.getDiskInfo();
+            uptimeInfo = LinuxHardwareCommands.getUptime();
+            cpuInfo = LinuxHardwareCommands.getCpuInfo();
+            memoryInfo = LinuxHardwareCommands.getMemoryInfo();
+        } else {
+            osInfo = MacHardwareCommands.getOsVersion();
+            diskInfo = MacHardwareCommands.getDiskInfo();
+            uptimeInfo = MacHardwareCommands.getUptime();
+            cpuInfo = MacHardwareCommands.getCpuInfo();
+            memoryInfo = MacHardwareCommands.getMemoryInfo();
+        }
+
         String parsedUptime = extractUptimeLine(uptimeInfo);
         String diskLine = extractPrimaryDisk(diskInfo);
         String[] diskValues = parseDiskValues(diskLine);
 
-        // Build structured data object
         SystemData data = new SystemData();
         data.os = osInfo;
         data.cpu = cpuInfo;
@@ -31,22 +43,17 @@ public class SystemInfo {
         data.diskAvailable = diskValues[2];
         data.diskUsagePercent = diskValues[3];
 
-        // Convert to JSON
         String json = data.toJson();
 
-        // Output JSON
         System.out.println("=== JSON OUTPUT ===");
         System.out.println(json);
 
-        // Send JSON to API
         sendPost(json);
     }
 
-    // Send JSON data to API endpoint
     public static void sendPost(String json) {
 
         try {
-            // Update this URL when you have a real server
             URL url = new URL("http://192.168.1.87:8080/checkin");
 
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -55,7 +62,6 @@ public class SystemInfo {
             conn.setRequestProperty("Content-Type", "application/json");
             conn.setDoOutput(true);
 
-            // Write JSON body
             OutputStream os = conn.getOutputStream();
             os.write(json.getBytes());
             os.flush();
@@ -69,17 +75,6 @@ public class SystemInfo {
         }
     }
 
-    // Retrieve CPU information (macOS)
-    public static String getCPUInfo() {
-        return CommandRunner.runCommand("sysctl", "-n", "machdep.cpu.brand_string");
-    }
-
-    // Retrieve memory information (macOS)
-    public static String getMemoryInfo() {
-        return CommandRunner.runCommand("vm_stat");
-    }
-
-    // Extract uptime line containing load averages
     public static String extractUptimeLine(String uptimeOutput) {
         for (String line : uptimeOutput.split("\n")) {
             if (line.toLowerCase().contains("load average")) {
@@ -89,7 +84,6 @@ public class SystemInfo {
         return "Uptime information not found";
     }
 
-    // Extract primary disk entry (root mount)
     public static String extractPrimaryDisk(String diskOutput) {
         String[] lines = diskOutput.split("\n");
 
@@ -104,7 +98,6 @@ public class SystemInfo {
         return "";
     }
 
-    // Parse disk values into fields
     public static String[] parseDiskValues(String diskLine) {
 
         if (diskLine == null || diskLine.isEmpty()) {

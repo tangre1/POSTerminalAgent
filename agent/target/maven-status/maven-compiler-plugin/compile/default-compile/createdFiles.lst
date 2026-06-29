@@ -1,3 +1,5 @@
-SystemInfo.class
 SystemData.class
+MacHardwareCommands.class
+LinuxHardwareCommands.class
+SystemInfo.class
 CommandRunner.class
