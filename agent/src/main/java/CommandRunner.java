@@ -3,6 +3,8 @@ import java.io.InputStreamReader;
 
 public class CommandRunner {
 
+    private static final String UNAVAILABLE = "Unavailable";
+
     public static String runCommand(String... command) {
         StringBuilder output = new StringBuilder();
 
@@ -20,28 +22,26 @@ public class CommandRunner {
 
             String line;
 
-            // Read standard output
             while ((line = reader.readLine()) != null) {
                 output.append(line).append("\n");
             }
 
-            // Read error output
-            while ((line = errorReader.readLine()) != null) {
-                output.append("ERROR: ").append(line).append("\n");
+            while (errorReader.readLine() != null) {
+
             }
 
             int exitCode = process.waitFor();
 
-            // If command failed, return empty string so caller can handle it
-            if (exitCode != 0) {
-                return "";
+            String result = output.toString().trim();
+
+            if (exitCode != 0 || result.isBlank()) {
+                return UNAVAILABLE;
             }
 
-        } catch (Exception e) {
-            // Return empty string on exception to allow program to continue safely
-            return "";
-        }
+            return result;
 
-        return output.toString().trim();
+        } catch (Exception e) {
+            return UNAVAILABLE;
+        }
     }
 }

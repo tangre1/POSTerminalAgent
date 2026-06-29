@@ -1,13 +1,5 @@
 public class MacHardwareCommands {
 
-    public static String getOsVersion() {
-        return CommandRunner.runCommand("sw_vers");
-    }
-
-    public static String getKernelVersion() {
-        return CommandRunner.runCommand("uname", "-a");
-    }
-
     public static String getHostname() {
         return CommandRunner.runCommand("hostname");
     }
@@ -17,34 +9,106 @@ public class MacHardwareCommands {
     }
 
     public static String getMacAddress() {
-        return CommandRunner.runCommand("sh", "-c", "ifconfig en0 | awk '/ether/{print $2}'");
+        return CommandRunner.runCommand(
+                "sh",
+                "-c",
+                "ifconfig en0 | awk '/ether/{print $2}'"
+        );
     }
 
-    public static String getCpuInfo() {
-        return CommandRunner.runCommand("sysctl", "-n", "machdep.cpu.brand_string");
+    public static String getOsName() {
+        return CommandRunner.runCommand(
+                "sh",
+                "-c",
+                "sw_vers -productName"
+        );
     }
 
-    public static String getMemoryInfo() {
-        return CommandRunner.runCommand("sysctl", "-n", "hw.memsize");
+    public static String getOsVersion() {
+        return CommandRunner.runCommand(
+                "sh",
+                "-c",
+                "sw_vers -productVersion"
+        );
+    }
+
+    public static String getOsBuild() {
+        return CommandRunner.runCommand(
+                "sh",
+                "-c",
+                "sw_vers -buildVersion"
+        );
+    }
+
+    public static String getKernelVersion() {
+        return CommandRunner.runCommand("uname", "-r");
+    }
+
+    public static String getCpuModel() {
+        return CommandRunner.runCommand(
+                "sysctl",
+                "-n",
+                "machdep.cpu.brand_string"
+        );
+    }
+
+    public static String getMemoryTotal() {
+        return CommandRunner.runCommand(
+                "sysctl",
+                "-n",
+                "hw.memsize"
+        );
     }
 
     public static String getDiskInfo() {
-        return CommandRunner.runCommand("df", "-h", "/");
+        return CommandRunner.runCommand(
+                "df",
+                "-h",
+                "/"
+        );
+    }
+
+    public static String getManufacturer() {
+        return "Apple";
+    }
+
+    public static String getModelNumber() {
+        return CommandRunner.runCommand(
+                "sh",
+                "-c",
+                "system_profiler SPHardwareDataType | awk -F': ' '/Model Name/{print $2}'"
+        );
+    }
+
+    public static String getSerialNumber() {
+        return CommandRunner.runCommand(
+                "sh",
+                "-c",
+                "system_profiler SPHardwareDataType | awk -F': ' '/Serial Number/{print $2}'"
+        );
+    }
+
+    public static String getBiosVersion() {
+        return "Unavailable";
+    }
+
+    public static String getJavaVersion() {
+        return CommandRunner.runCommand(
+                "sh",
+                "-c",
+                "java -version 2>&1 | head -n 1"
+        );
     }
 
     public static String getUptime() {
         return CommandRunner.runCommand("uptime");
     }
 
-    public static String getLastBootTime() {
-        return CommandRunner.runCommand("sysctl", "-n", "kern.boottime");
-    }
-
-    public static String getHardwareProfile() {
-        return CommandRunner.runCommand("system_profiler", "SPHardwareDataType");
-    }
-
-    public static String getJavaVersion() {
-        return CommandRunner.runCommand("java", "-version");
+    public static String getLastBoot() {
+        return CommandRunner.runCommand(
+                "sysctl",
+                "-n",
+                "kern.boottime"
+        );
     }
 }
